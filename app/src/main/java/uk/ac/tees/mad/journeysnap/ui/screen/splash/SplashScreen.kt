@@ -37,11 +37,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 import uk.ac.tees.mad.journeysnap.R
+import uk.ac.tees.mad.journeysnap.utils.Constants.GALLERY_SCREEN
+import uk.ac.tees.mad.journeysnap.utils.Constants.SPLASH_SCREEN
+import uk.ac.tees.mad.journeysnap.utils.Constants.WELCOME_SCREEN
 
 @Composable
-fun SplashScreen() {
+fun SplashScreen(navController: NavController) {
 
     val backgroundColor = Color(0xFFAA60C8)
 
@@ -49,6 +54,8 @@ fun SplashScreen() {
     var showCircle by remember { mutableStateOf(false) }
     var showAppName by remember { mutableStateOf(false) }
     var showTagline by remember { mutableStateOf(false) }
+
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
     val logoScale = animateFloatAsState(
         targetValue = if (showLogo) 1f else 0.5f,
@@ -117,6 +124,20 @@ fun SplashScreen() {
         delay(500)
         showTagline = true
         delay(1000)
+        if (currentUser==null) {
+            navController.navigate(WELCOME_SCREEN){
+                popUpTo(SPLASH_SCREEN){
+                    inclusive = true
+                }
+            }
+        }
+        else{
+            navController.navigate(GALLERY_SCREEN){
+                popUpTo(SPLASH_SCREEN){
+                    inclusive = true
+                }
+            }
+        }
     }
 
     Box(
@@ -178,7 +199,6 @@ fun SplashScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // App name
             AnimatedVisibility(
                 visible = showAppName,
                 enter = fadeIn(animationSpec = tween(1000)) +

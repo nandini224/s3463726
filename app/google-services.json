@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "370759987257",
+    "project_id": "journeysnap-764ed",
+    "storage_bucket": "journeysnap-764ed.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:370759987257:android:cfa16392d401514dcc5de8",
+        "android_client_info": {
+          "package_name": "uk.ac.tees.mad.journeysnap"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxMNK_XkV0xd0QY-h1LZvW8pNrD_tH6BQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -22,6 +22,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,20 +33,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import uk.ac.tees.mad.journeysnap.R
-import uk.ac.tees.mad.journeysnap.ui.theme.JourneySnapTheme
+import uk.ac.tees.mad.journeysnap.utils.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(navController: NavController, viewModel: AuthViewModel = hiltViewModel()) {
+    val isLoading by viewModel.isLoading.collectAsState()
+    val isLoginSuccess by viewModel.isLoginSuccess.collectAsState()
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+
+    LaunchedEffect(isLoginSuccess) {
+        if (isLoginSuccess){
+            navController.navigate(Constants.GALLERY_SCREEN) {
+                popUpTo(0)
+            }
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -54,7 +70,6 @@ fun LoginScreen() {
             contentDescription = "Login Background",
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            alpha = 0.5f
         )
 
         Column(
@@ -120,19 +135,22 @@ fun LoginScreen() {
                         )
                     )
 
-                    Button(
-                        onClick = { },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary
-                        )
-                    ) {
-                        Text(
-                            text = "Login",
-                            modifier = Modifier.padding(vertical = 8.dp)
-                        )
+                    if (!isLoading) {
+                        Button(
+                            onClick = {viewModel.loginUser(email, password, context) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary
+                            )
+                        ) {
+                            Text(
+                                text = "Login",
+                                color = Color.White,
+                                modifier = Modifier.padding(vertical = 8.dp)
+                            )
+                        }
                     }
                 }
             }
@@ -140,7 +158,11 @@ fun LoginScreen() {
             Spacer(modifier = Modifier.height(16.dp))
 
             TextButton(
-                onClick = { }
+                onClick = {navController.navigate(Constants.SIGNUP_SCREEN){
+                    popUpTo(Constants.LOGIN_SCREEN){
+                        inclusive = true
+                    }
+                } }
             ) {
                 Text(
                     text = "Don't have an account? Sign up",
@@ -149,7 +171,7 @@ fun LoginScreen() {
             }
 
             TextButton(
-                onClick = {  }
+                onClick = { navController.popBackStack() }
             ) {
                 Text(
                     text = "Back to Welcome Screen",

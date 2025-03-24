@@ -25,14 +25,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import uk.ac.tees.mad.journeysnap.R
-import uk.ac.tees.mad.journeysnap.ui.theme.JourneySnapTheme
+import uk.ac.tees.mad.journeysnap.utils.Constants
+import uk.ac.tees.mad.journeysnap.utils.Constants.LOGIN_SCREEN
+import uk.ac.tees.mad.journeysnap.utils.Constants.SIGNUP_SCREEN
+import uk.ac.tees.mad.journeysnap.utils.Constants.WELCOME_SCREEN
 
 @Composable
-fun WelcomeScreen() {
+fun WelcomeScreen(navController: NavController) {
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -79,7 +82,7 @@ fun WelcomeScreen() {
                 Spacer(modifier = Modifier.height(32.dp))
 
                 Button(
-                    onClick = { },
+                    onClick = { navController.navigate(LOGIN_SCREEN)},
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp),
@@ -89,12 +92,13 @@ fun WelcomeScreen() {
                 ) {
                     Text(
                         text = "Log In",
+                        color = Color.White,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }
 
                 OutlinedButton(
-                    onClick = {  },
+                    onClick = { navController.navigate(SIGNUP_SCREEN) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 32.dp),
