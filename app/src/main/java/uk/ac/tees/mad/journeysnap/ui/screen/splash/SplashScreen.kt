@@ -166,8 +166,6 @@ fun SplashScreen() {
                     .alpha(circleAlpha.value)
                     .border(4.dp, Color.White, CircleShape)
             ) {
-
-                // App logo from drawable resource
                 Image(
                     painter = painterResource(R.drawable.app_logo),
                     contentDescription = "App Logo",
@@ -196,7 +194,6 @@ fun SplashScreen() {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Tagline
             AnimatedVisibility(
                 visible = showTagline,
                 enter = fadeIn(animationSpec = tween(1000))
