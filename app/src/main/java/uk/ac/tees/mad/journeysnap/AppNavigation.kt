@@ -9,8 +9,12 @@ import uk.ac.tees.mad.journeysnap.ui.screen.auth.LoginScreen
 import uk.ac.tees.mad.journeysnap.ui.screen.auth.SignupScreen
 import uk.ac.tees.mad.journeysnap.ui.screen.auth.WelcomeScreen
 import uk.ac.tees.mad.journeysnap.ui.screen.gallery.GalleryScreen
+import uk.ac.tees.mad.journeysnap.ui.screen.journal.JournalScreen
+import uk.ac.tees.mad.journeysnap.ui.screen.setting.SettingScreen
 import uk.ac.tees.mad.journeysnap.utils.Constants.GALLERY_SCREEN
+import uk.ac.tees.mad.journeysnap.utils.Constants.JOURNAL_SCREEN
 import uk.ac.tees.mad.journeysnap.utils.Constants.LOGIN_SCREEN
+import uk.ac.tees.mad.journeysnap.utils.Constants.SETTING_SCREEN
 import uk.ac.tees.mad.journeysnap.utils.Constants.SIGNUP_SCREEN
 import uk.ac.tees.mad.journeysnap.utils.Constants.SPLASH_SCREEN
 import uk.ac.tees.mad.journeysnap.utils.Constants.WELCOME_SCREEN
@@ -36,7 +40,15 @@ fun AppNavigation() {
         }
 
         composable(GALLERY_SCREEN) {
-            GalleryScreen()
+            GalleryScreen(navController)
+        }
+
+        composable(JOURNAL_SCREEN) {
+            JournalScreen()
+        }
+
+        composable(SETTING_SCREEN) {
+            SettingScreen()
         }
     }
 }
