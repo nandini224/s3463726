@@ -43,6 +43,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -59,6 +60,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import uk.ac.tees.mad.journeysnap.R
 import uk.ac.tees.mad.journeysnap.ui.components.HeadingContainer
 import uk.ac.tees.mad.journeysnap.ui.components.ImageContainer
@@ -69,12 +71,13 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun JournalScreen(viewModel: JournalViewModel = hiltViewModel()) {
+fun JournalScreen(
+    navController: NavController,
+    viewModel: JournalViewModel = hiltViewModel()) {
     var name by remember { mutableStateOf("") }
     var story by remember { mutableStateOf("") }
-    val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(System.currentTimeMillis()))
-    var startDate by remember { mutableStateOf(currentDate) }
-    var endDate by remember { mutableStateOf(currentDate) }
+    var startDate by remember { mutableLongStateOf(System.currentTimeMillis()) }
+    var endDate by remember { mutableLongStateOf(System.currentTimeMillis()) }
     var location by remember { mutableStateOf("") }
     val imageList by viewModel.imageList.collectAsState()
     var showDatePicker by remember { mutableStateOf(false) }
@@ -187,30 +190,49 @@ fun JournalScreen(viewModel: JournalViewModel = hiltViewModel()) {
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
                                 .padding(start = 16.dp)
-                                .background(shape = RoundedCornerShape(8.dp), color = Color.LightGray.copy(0.4f))
+                                .background(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = Color.LightGray.copy(0.4f)
+                                )
                                 .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
                                 .weight(1f)
                                 .clickable {
                                     dateState = 1
                                     showDatePicker = true
                                 }
-                        ){
-                            Text(startDate,modifier = Modifier.padding(16.dp))
+                        ) {
+                            Text(
+                                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(
+                                    Date(
+                                        startDate
+                                    )
+                                ), modifier = Modifier.padding(16.dp)
+                            )
                         }
                         Text("To", modifier = Modifier.padding(12.dp))
                         Box(
                             contentAlignment = Alignment.Center,
                             modifier = Modifier
                                 .padding(start = 16.dp)
-                                .background(shape = RoundedCornerShape(8.dp), color = Color.LightGray.copy(0.4f))
+                                .background(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = Color.LightGray.copy(0.4f)
+                                )
                                 .border(1.dp, Color.Gray, RoundedCornerShape(4.dp))
                                 .weight(1f)
                                 .clickable {
                                     dateState = 2
                                     showDatePicker = true
                                 }
-                        ){
-                            Text(endDate, modifier = Modifier.padding(16.dp))
+                        ) {
+                            Text(
+                                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(
+                                    Date(
+                                        endDate
+                                    )
+                                ),
+                                modifier = Modifier.padding(16.dp)
+                            )
                         }
                     }
                 }
@@ -221,7 +243,7 @@ fun JournalScreen(viewModel: JournalViewModel = hiltViewModel()) {
                 ) {
                     LazyRow(modifier = Modifier.padding(start = 16.dp)) {
 
-                        items(imageList) {uri->
+                        items(imageList) { uri ->
                             ImageContainer(uri)
                         }
                         item {
@@ -234,7 +256,7 @@ fun JournalScreen(viewModel: JournalViewModel = hiltViewModel()) {
                                     .clickable {
                                         showSheet = true
                                     }
-                            ){
+                            ) {
                                 Image(
                                     painter = painterResource(R.drawable.add_image),
                                     contentDescription = "image",
@@ -245,21 +267,31 @@ fun JournalScreen(viewModel: JournalViewModel = hiltViewModel()) {
                     }
                 }
 
-                TextButton({},
+                TextButton(
+                    {
+                        viewModel.addJournal(
+                            name, location, story, endDate, startDate, context,
+                            onComplete = {
+                                navController.popBackStack()
+                            }
+                        )
+                    },
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(),
                     modifier = Modifier
                         .padding(top = 20.dp)
                         .fillMaxWidth()
-                    ) {
-                    Text("Add",
-                        style = MaterialTheme.typography.titleLarge)
+                ) {
+                    Text(
+                        "Add",
+                        style = MaterialTheme.typography.titleLarge
+                    )
                 }
             }
         }
-        if (showDatePicker){
+        if (showDatePicker) {
             DatePickerDialog(
-                onDismissRequest = {showDatePicker = false},
+                onDismissRequest = { showDatePicker = false },
                 confirmButton = {
                     TextButton(onClick = { showDatePicker = false }) {
                         Text("OK")
@@ -277,15 +309,12 @@ fun JournalScreen(viewModel: JournalViewModel = hiltViewModel()) {
                 )
 
                 LaunchedEffect(datePickerState.selectedDateMillis) {
-                    datePickerState.selectedDateMillis?.let { millis->
-                        val selectedDate = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(
-                            Date(millis)
-                        )
-                        if (dateState==1){
-                            startDate = selectedDate
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        if (dateState == 1) {
+                            startDate = millis
                         }
-                        if (dateState==2){
-                            endDate = selectedDate
+                        if (dateState == 2) {
+                            endDate = millis
                         }
                     }
                 }
@@ -312,7 +341,11 @@ fun JournalScreen(viewModel: JournalViewModel = hiltViewModel()) {
                 Button(
                     onClick = {
                         showSheet = false
-                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                        if (ContextCompat.checkSelfPermission(
+                                context,
+                                Manifest.permission.CAMERA
+                            ) != PackageManager.PERMISSION_GRANTED
+                        ) {
                             permissionLauncher.launch(Manifest.permission.CAMERA)
                         } else {
                             cameraLauncher.launch()
@@ -322,15 +355,16 @@ fun JournalScreen(viewModel: JournalViewModel = hiltViewModel()) {
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Icon(imageVector = ImageVector.vectorResource(R.drawable.baseline_camera_alt_24),
-                        contentDescription = "Camera", tint = Color.White)
+                    Icon(
+                        imageVector = ImageVector.vectorResource(R.drawable.baseline_camera_alt_24),
+                        contentDescription = "Camera", tint = Color.White
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Open Camera", color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Gallery Button
                 Button(
                     onClick = {
                         showSheet = false
@@ -342,7 +376,8 @@ fun JournalScreen(viewModel: JournalViewModel = hiltViewModel()) {
                 ) {
                     Icon(
                         imageVector = ImageVector.vectorResource(R.drawable.baseline_photo_24),
-                        contentDescription = "Gallery", tint = Color.White)
+                        contentDescription = "Gallery", tint = Color.White
+                    )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text("Select from Gallery", color = Color.White)
                 }

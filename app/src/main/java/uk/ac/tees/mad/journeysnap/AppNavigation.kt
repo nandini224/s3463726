@@ -44,7 +44,7 @@ fun AppNavigation() {
         }
 
         composable(JOURNAL_SCREEN) {
-            JournalScreen()
+            JournalScreen(navController)
         }
 
         composable(SETTING_SCREEN) {

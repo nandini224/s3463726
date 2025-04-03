@@ -9,4 +9,5 @@ object Constants {
     const val JOURNAL_SCREEN = "journal_screen"
     const val SETTING_SCREEN = "setting_screen"
     const val USERS = "users"
+    const val JOURNALS = "journals"
 }
