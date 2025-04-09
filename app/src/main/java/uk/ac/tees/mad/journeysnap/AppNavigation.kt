@@ -2,6 +2,7 @@ package uk.ac.tees.mad.journeysnap
 
 import SplashScreen
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -9,6 +10,7 @@ import uk.ac.tees.mad.journeysnap.ui.screen.auth.LoginScreen
 import uk.ac.tees.mad.journeysnap.ui.screen.auth.SignupScreen
 import uk.ac.tees.mad.journeysnap.ui.screen.auth.WelcomeScreen
 import uk.ac.tees.mad.journeysnap.ui.screen.gallery.GalleryScreen
+import uk.ac.tees.mad.journeysnap.ui.screen.gallery.GalleryViewModel
 import uk.ac.tees.mad.journeysnap.ui.screen.journal.JournalScreen
 import uk.ac.tees.mad.journeysnap.ui.screen.setting.SettingScreen
 import uk.ac.tees.mad.journeysnap.utils.Constants.GALLERY_SCREEN
@@ -22,6 +24,8 @@ import uk.ac.tees.mad.journeysnap.utils.Constants.WELCOME_SCREEN
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
+
+    val galleryViewModel:GalleryViewModel = hiltViewModel()
 
     NavHost(navController, SPLASH_SCREEN) {
         composable(SPLASH_SCREEN) {

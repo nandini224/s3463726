@@ -5,19 +5,25 @@ import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import uk.ac.tees.mad.journeysnap.model.Journal
+import uk.ac.tees.mad.journeysnap.model.JournalEntity
+import uk.ac.tees.mad.journeysnap.roomdb.Repository
 import uk.ac.tees.mad.journeysnap.utils.Constants.JOURNALS
 import uk.ac.tees.mad.journeysnap.utils.Constants.USERS
 import uk.ac.tees.mad.journeysnap.utils.Utils
 import javax.inject.Inject
 
 @HiltViewModel
-class JournalViewModel @Inject constructor() : ViewModel() {
+class JournalViewModel @Inject constructor(
+    private val repository: Repository
+) : ViewModel() {
 
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
@@ -57,7 +63,19 @@ class JournalViewModel @Inject constructor() : ViewModel() {
             }
             imageString?.let { image ->
                 val journal = Journal(name, location, story, startDate, endDate, image)
-                journalDB.add(journal).addOnSuccessListener {
+                journalDB.add(journal).addOnSuccessListener { task->
+                    viewModelScope.launch {
+                        val entity = JournalEntity(
+                            id = task.id,
+                            name = name,
+                            story = story,
+                            location = location,
+                            startDate = startDate,
+                            endDate = endDate,
+                            image = image
+                        )
+                        repository.addJournal(entity)
+                    }
                 }
                     .addOnFailureListener {task->
                         Log.e("TaskCompletion", task.message.toString())
