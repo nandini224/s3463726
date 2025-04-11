@@ -1,6 +1,7 @@
 package uk.ac.tees.mad.journeysnap.ui.screen.journal
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -30,15 +31,15 @@ class JournalViewModel @Inject constructor(
 
     val userId = auth.currentUser?.uid ?: ""
 
-    private val _imageList = MutableStateFlow(emptyList<Uri>())
-    val imageList: StateFlow<List<Uri>> get() = _imageList
+    private val _imageList = MutableStateFlow(emptyList<Bitmap>())
+    val imageList: StateFlow<List<Bitmap>> get() = _imageList
 
-    fun addImage(uri: Uri) {
-        _imageList.value = _imageList.value.toMutableList().apply { add(uri) }
+    fun addImage(bitmap: Bitmap) {
+        _imageList.value = _imageList.value.toMutableList().apply { add(bitmap) }
     }
 
-    fun addImage(uris: List<Uri>) {
-        _imageList.value = _imageList.value.toMutableList().apply { addAll(uris) }
+    fun addImage(bitMaps: List<Bitmap>) {
+        _imageList.value = _imageList.value.toMutableList().apply { addAll(bitMaps) }
     }
 
     fun addJournal(
@@ -56,8 +57,8 @@ class JournalViewModel @Inject constructor(
             .document(userId)
             .collection(JOURNALS)
 
-        _imageList.value.forEach { uri ->
-            val imageString = Utils.uriToBase64(context, uri)
+        _imageList.value.forEach { bitmap ->
+            val imageString = Utils.bitmapToBase64(bitmap)
             if (imageString==null){
                 Log.e("ImageString", "Null Image")
             }

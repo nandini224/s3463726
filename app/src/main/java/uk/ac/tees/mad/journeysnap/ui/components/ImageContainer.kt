@@ -1,6 +1,6 @@
 package uk.ac.tees.mad.journeysnap.ui.components
 
-import android.net.Uri
+import android.graphics.Bitmap
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 
 @Composable
-fun ImageContainer(uri:Uri,modifier: Modifier = Modifier) {
+fun ImageContainer(bitmap: Bitmap,modifier: Modifier = Modifier) {
     Box(contentAlignment = Alignment.Center,
         modifier = modifier
             .padding(end = 12.dp)
@@ -24,7 +24,7 @@ fun ImageContainer(uri:Uri,modifier: Modifier = Modifier) {
         .padding(8.dp)
     ){
         AsyncImage(
-            model = uri,
+            model = bitmap,
             contentDescription = "image",
             contentScale = ContentScale.Crop
         )

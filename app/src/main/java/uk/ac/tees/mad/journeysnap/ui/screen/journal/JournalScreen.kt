@@ -64,10 +64,8 @@ import androidx.navigation.NavController
 import uk.ac.tees.mad.journeysnap.R
 import uk.ac.tees.mad.journeysnap.ui.components.HeadingContainer
 import uk.ac.tees.mad.journeysnap.ui.components.ImageContainer
-import uk.ac.tees.mad.journeysnap.utils.Utils.saveBitmapToCache
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import uk.ac.tees.mad.journeysnap.utils.Utils.getDate
+import uk.ac.tees.mad.journeysnap.utils.Utils.uriToBitmap
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -98,15 +96,15 @@ fun JournalScreen(
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
         if (bitmap != null) {
-            val uri = saveBitmapToCache(context, bitmap)
-            viewModel.addImage(uri)
+            viewModel.addImage(bitmap)
         }
     }
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetMultipleContents()
     ) { uris ->
-        viewModel.addImage(uris)
+        val bitmaps = uris.mapNotNull { uri -> uriToBitmap(context, uri) }
+        viewModel.addImage(bitmaps)
     }
 
     Scaffold(
@@ -202,11 +200,8 @@ fun JournalScreen(
                                 }
                         ) {
                             Text(
-                                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(
-                                    Date(
-                                        startDate
-                                    )
-                                ), modifier = Modifier.padding(16.dp)
+                                getDate(startDate),
+                                modifier = Modifier.padding(16.dp)
                             )
                         }
                         Text("To", modifier = Modifier.padding(12.dp))
@@ -226,11 +221,7 @@ fun JournalScreen(
                                 }
                         ) {
                             Text(
-                                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(
-                                    Date(
-                                        endDate
-                                    )
-                                ),
+                                getDate(endDate),
                                 modifier = Modifier.padding(16.dp)
                             )
                         }
@@ -243,8 +234,8 @@ fun JournalScreen(
                 ) {
                     LazyRow(modifier = Modifier.padding(start = 16.dp)) {
 
-                        items(imageList) { uri ->
-                            ImageContainer(uri)
+                        items(imageList) { bitMap ->
+                            ImageContainer(bitMap)
                         }
                         item {
                             Box(contentAlignment = Alignment.Center,
