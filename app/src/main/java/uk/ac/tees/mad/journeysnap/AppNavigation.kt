@@ -44,7 +44,7 @@ fun AppNavigation() {
         }
 
         composable(GALLERY_SCREEN) {
-            GalleryScreen(navController)
+            GalleryScreen(navController, galleryViewModel)
         }
 
         composable(JOURNAL_SCREEN) {

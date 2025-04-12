@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,27 +25,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import uk.ac.tees.mad.journeysnap.R
+import coil.compose.AsyncImage
 import uk.ac.tees.mad.journeysnap.model.JournalEntity
+import uk.ac.tees.mad.journeysnap.utils.Utils
 import uk.ac.tees.mad.journeysnap.utils.Utils.getDate
 
 @Composable
 fun JournalItem(journal: JournalEntity, modifier: Modifier = Modifier) {
-    Card(modifier = modifier.height(250.dp)) {
+    Card(modifier = modifier
+        .fillMaxWidth()
+        .height(250.dp)) {
         Row(
             modifier.fillMaxSize()
         ) {
-            Image(
-                painter = painterResource(R.drawable.sample_image),
-                contentDescription = "image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.weight(2f)
-            )
+            Utils.base64ToBitmap(journal.image)?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = "image",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.weight(2f)
+                        .fillMaxHeight()
+                        .fillMaxWidth()
+                )
+            }
             Column(
                 modifier = Modifier
                     .padding(16.dp)
