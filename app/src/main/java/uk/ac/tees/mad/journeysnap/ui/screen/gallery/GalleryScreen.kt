@@ -35,7 +35,7 @@ import uk.ac.tees.mad.journeysnap.utils.Constants
 
 @Composable
 fun GalleryScreen(navController: NavController, viewModel: GalleryViewModel) {
-    val searchQuery = remember { mutableStateOf("") }
+    val searchQuery by viewModel.searchQuery.collectAsState()
     val journalList by viewModel.journalList.collectAsState()
     Scaffold(
         topBar = {
@@ -57,8 +57,8 @@ fun GalleryScreen(navController: NavController, viewModel: GalleryViewModel) {
                 }
 
                 OutlinedTextField(
-                    value = searchQuery.value,
-                    onValueChange = {searchQuery.value = it},
+                    value = searchQuery,
+                    onValueChange = {viewModel.onQueryChange(it)},
                     leadingIcon = { Icon(
                         Icons.Default.Search,
                         contentDescription = "Search"

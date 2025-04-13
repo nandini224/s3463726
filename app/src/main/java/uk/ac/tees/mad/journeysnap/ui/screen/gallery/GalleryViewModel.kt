@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import uk.ac.tees.mad.journeysnap.model.Journal
 import uk.ac.tees.mad.journeysnap.model.JournalEntity
@@ -26,6 +27,8 @@ class GalleryViewModel @Inject constructor(
 
     private val _journalList = MutableStateFlow(emptyList<JournalEntity>())
     val journalList:StateFlow<List<JournalEntity>> get() = _journalList
+    private val _searchQuery =  MutableStateFlow("")
+    val searchQuery:StateFlow<String> get() = _searchQuery
 
     init {
         viewModelScope.launch {
@@ -54,10 +57,21 @@ class GalleryViewModel @Inject constructor(
                 }
         }
         viewModelScope.launch {
-            repository.getAllJournal().collect{
+            combine(
+                repository.getAllJournal(),
+                _searchQuery
+            ) { journals, query ->
+                journals.filter { journal ->
+                    journal.name.contains(query, ignoreCase = true) ||
+                            journal.location.contains(query, ignoreCase = true)
+                }.sortedByDescending { it.startDate }
+            }.collect {
                 _journalList.value = it
-                Log.e("Data Size", _journalList.value.size.toString())
             }
         }
+    }
+
+    fun onQueryChange(query:String){
+        _searchQuery.value = query
     }
 }
