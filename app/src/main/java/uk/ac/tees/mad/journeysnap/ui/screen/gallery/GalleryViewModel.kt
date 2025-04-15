@@ -1,6 +1,10 @@
 package uk.ac.tees.mad.journeysnap.ui.screen.gallery
 
+import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
 import android.util.Log
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -15,6 +19,7 @@ import uk.ac.tees.mad.journeysnap.model.JournalEntity
 import uk.ac.tees.mad.journeysnap.roomdb.Repository
 import uk.ac.tees.mad.journeysnap.utils.Constants.JOURNALS
 import uk.ac.tees.mad.journeysnap.utils.Constants.USERS
+import uk.ac.tees.mad.journeysnap.utils.Utils.getImageUri
 import javax.inject.Inject
 
 @HiltViewModel
@@ -71,7 +76,38 @@ class GalleryViewModel @Inject constructor(
         }
     }
 
+    fun deleteJournal(entity: JournalEntity, context: Context){
+        db.collection(USERS)
+            .document(userId)
+            .collection(JOURNALS)
+            .document(entity.id)
+            .delete()
+            .addOnSuccessListener {
+                viewModelScope.launch {
+                    repository.deleteJournal(entity)
+                }
+                Toast.makeText(context, "Deleted Successfully", Toast.LENGTH_SHORT).show()
+            }
+            .addOnFailureListener {
+                Toast.makeText(context, "Failed to delete", Toast.LENGTH_SHORT).show()
+            }
+    }
+
     fun onQueryChange(query:String){
         _searchQuery.value = query
+    }
+
+    fun shareImage(context: Context, image: String) {
+        val uri = getImageUri(context, image)
+        if (uri != null) {
+            val intent = Intent(Intent.ACTION_SEND).apply {
+                type = "image/*"
+                putExtra(Intent.EXTRA_STREAM, uri)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            context.startActivity(Intent.createChooser(intent, "Share Image"))
+        } else {
+            Toast.makeText(context, "Failed to share image", Toast.LENGTH_SHORT).show()
+        }
     }
 }

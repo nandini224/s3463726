@@ -36,7 +36,10 @@ import uk.ac.tees.mad.journeysnap.utils.Utils
 import uk.ac.tees.mad.journeysnap.utils.Utils.getDate
 
 @Composable
-fun JournalItem(journal: JournalEntity, modifier: Modifier = Modifier) {
+fun JournalItem(journal: JournalEntity,
+                onDelete:()->Unit,
+                onShare:()->Unit,
+                modifier: Modifier = Modifier) {
     Card(modifier = modifier
         .fillMaxWidth()
         .height(250.dp)) {
@@ -97,14 +100,14 @@ fun JournalItem(journal: JournalEntity, modifier: Modifier = Modifier) {
                         .padding(start = 12.dp)
                 )
                 Row {
-                    IconButton({}) {
+                    IconButton({onDelete()}) {
                         Icon(
                             Icons.Outlined.Delete,
                             contentDescription = "Delete"
                         )
                     }
                     Spacer(Modifier.width(30.dp))
-                    IconButton({}) {
+                    IconButton({onShare()}) {
                         Icon(
                             Icons.Outlined.Share,
                             contentDescription = "Share"

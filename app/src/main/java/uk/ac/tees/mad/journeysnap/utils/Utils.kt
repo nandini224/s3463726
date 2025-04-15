@@ -6,7 +6,9 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Base64
 import android.util.Log
+import androidx.core.content.FileProvider
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -55,5 +57,22 @@ object Utils {
     fun getDate(timeMillis:Long):String{
         return SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(timeMillis))
     }
+
+    fun getImageUri(context: Context, image: String): Uri? {
+        return try {
+            val bitmap = base64ToBitmap(image)
+            val file = File(context.cacheDir, "shared_image.png")
+            if (bitmap != null) {
+                file.outputStream().use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+                }
+            }
+            FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
+        } catch (e: Exception) {
+            Log.e("GetImageUri", e.message.toString())
+            null
+        }
+    }
+
 
 }

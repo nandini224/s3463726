@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -37,6 +38,7 @@ import uk.ac.tees.mad.journeysnap.utils.Constants
 fun GalleryScreen(navController: NavController, viewModel: GalleryViewModel) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val journalList by viewModel.journalList.collectAsState()
+    val context = LocalContext.current
     Scaffold(
         topBar = {
             Column(modifier = Modifier.padding(top = 30.dp, bottom = 12.dp,start = 16.dp, end = 16.dp)) {
@@ -86,7 +88,10 @@ fun GalleryScreen(navController: NavController, viewModel: GalleryViewModel) {
                 .padding(horizontal = 16.dp)
                 .fillMaxSize()) {
             items(journalList){journal->
-                JournalItem(journal)
+                JournalItem(journal,
+                    onDelete = {viewModel.deleteJournal(journal, context)},
+                    onShare = {viewModel.shareImage(context,journal.image)}
+                )
             }
         }
     }
