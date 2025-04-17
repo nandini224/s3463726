@@ -83,6 +83,7 @@ class JournalViewModel @Inject constructor(
                     }
             }
         }
+        Toast.makeText(context, "Journal added successfully", Toast.LENGTH_SHORT).show()
         onComplete()
     }
 }
