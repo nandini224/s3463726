@@ -23,6 +23,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -34,14 +36,26 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import uk.ac.tees.mad.journeysnap.R
 import uk.ac.tees.mad.journeysnap.ui.components.EditProfileBottomSheet
+import uk.ac.tees.mad.journeysnap.utils.Constants
+import uk.ac.tees.mad.journeysnap.utils.Utils
 
 @Composable
-fun SettingScreen(modifier: Modifier = Modifier) {
+fun SettingScreen(
+    navController: NavController,
+    modifier: Modifier = Modifier,
+    viewModel: SettingsViewModel = hiltViewModel()
+) {
     val showEditProfile = remember { mutableStateOf(false) }
-    val profileImage = remember { mutableStateOf<Bitmap?>(null) }
+    val tempImage = remember { mutableStateOf<Bitmap?>(null) }
+    val name by viewModel.name.collectAsState()
+    val email by viewModel.email.collectAsState()
+    val profileImage by viewModel.profileImage.collectAsState()
+
     val context = LocalContext.current
 
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -55,7 +69,7 @@ fun SettingScreen(modifier: Modifier = Modifier) {
         contract = ActivityResultContracts.TakePicturePreview()
     ) { bitmap ->
         if (bitmap != null) {
-            profileImage.value = bitmap
+            tempImage.value = bitmap
         }
     }
     Scaffold(
@@ -85,7 +99,7 @@ fun SettingScreen(modifier: Modifier = Modifier) {
                         modifier = Modifier.padding(16.dp)
                     ) {
                         AsyncImage(
-                            model = "",
+                            model = Utils.base64ToBitmap(profileImage),
                             contentDescription = "profile image",
                             placeholder = painterResource(R.drawable.profile),
                             error = painterResource(R.drawable.profile),
@@ -100,12 +114,12 @@ fun SettingScreen(modifier: Modifier = Modifier) {
                                 .weight(1f)
                         ) {
                             Text(
-                                "Name",
+                                name,
                                 fontWeight = FontWeight.Bold,
                                 style = MaterialTheme.typography.titleLarge
                             )
                             Text(
-                                "email@gmail.com",
+                                email,
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
@@ -127,7 +141,13 @@ fun SettingScreen(modifier: Modifier = Modifier) {
                         )
                     }
                 }
-                Card(onClick = {}, modifier = Modifier.padding(16.dp)) {
+                Card(onClick = {
+                    viewModel.logOut {
+                        navController.navigate(Constants.WELCOME_SCREEN){
+                            popUpTo(0)
+                        }
+                    }
+                }, modifier = Modifier.padding(16.dp)) {
                     Row(
                         modifier = Modifier.padding(16.dp)
                     ) {
@@ -147,9 +167,10 @@ fun SettingScreen(modifier: Modifier = Modifier) {
         }
         if (showEditProfile.value){
             EditProfileBottomSheet(
-                "name",
-                profileImage.value,
+                name,
+                tempImage.value,
                 onSave = {
+                    viewModel.changeProfile(it, tempImage.value)
                     showEditProfile.value = false
                 },
                 onImageClick = {

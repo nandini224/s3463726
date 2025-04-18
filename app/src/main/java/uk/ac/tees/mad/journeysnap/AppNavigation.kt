@@ -25,8 +25,6 @@ import uk.ac.tees.mad.journeysnap.utils.Constants.WELCOME_SCREEN
 fun AppNavigation() {
     val navController = rememberNavController()
 
-    val galleryViewModel:GalleryViewModel = hiltViewModel()
-
     NavHost(navController, SPLASH_SCREEN) {
         composable(SPLASH_SCREEN) {
             SplashScreen(navController)
@@ -44,7 +42,7 @@ fun AppNavigation() {
         }
 
         composable(GALLERY_SCREEN) {
-            GalleryScreen(navController, galleryViewModel)
+            GalleryScreen(navController)
         }
 
         composable(JOURNAL_SCREEN) {
@@ -52,7 +50,7 @@ fun AppNavigation() {
         }
 
         composable(SETTING_SCREEN) {
-            SettingScreen()
+            SettingScreen(navController)
         }
     }
 }

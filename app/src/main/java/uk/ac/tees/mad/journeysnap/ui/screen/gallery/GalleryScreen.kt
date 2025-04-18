@@ -35,7 +35,7 @@ import uk.ac.tees.mad.journeysnap.ui.components.JournalItem
 import uk.ac.tees.mad.journeysnap.utils.Constants
 
 @Composable
-fun GalleryScreen(navController: NavController, viewModel: GalleryViewModel) {
+fun GalleryScreen(navController: NavController, viewModel: GalleryViewModel= hiltViewModel()) {
     val searchQuery by viewModel.searchQuery.collectAsState()
     val journalList by viewModel.journalList.collectAsState()
     val context = LocalContext.current
